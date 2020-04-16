@@ -5,18 +5,7 @@ def feature1(mfcc, windowed_audio, fs):
     return 0
 
 
-def feature2(mfcc):
-    """
-    Example of feature using just mfcc
-    """
-    return 0
-
-
+# Used to store feature name and function reference
 feature_functions = {
-    """
-    Used to store feature name and function reference
-    """
-    
     'feature1': feature1,
-    'feature2': feature2,
 }

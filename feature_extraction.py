@@ -3,6 +3,7 @@ import features
 import os
 import numpy as np
 import scipy as sp
+import pandas as pd
 
 
 def preprocess(audio_path):
@@ -16,7 +17,7 @@ def preprocess(audio_path):
     # TODO: fine tune these parameters
     n_fft = 1024
     win_length = 1024
-    hop_size = win_length / 2
+    hop_size = int(win_length / 2)
     n_mels = 40
     n_cep = 12  # tipically 10-14
     window = 'hann'
@@ -26,8 +27,8 @@ def preprocess(audio_path):
 
     # time domain windowing
     window = sp.signal.get_window(window=window, Nx=win_length)
-    n_window = np.floor((len(audio) - win_length) / hop_size)
-    windowed_audio = np.zeros(win_length, n_window)
+    n_window = int(np.floor((len(audio) - win_length) / hop_size))
+    windowed_audio = np.zeros((n_window, win_length))
 
     for i in range(n_window):
         windowed_audio[i] = audio[i * hop_size:i * hop_size + win_length] * window
@@ -59,32 +60,35 @@ def extract_features(audio_path):
     Calculates all features defined in features module for
     a certain target file.
     :param url of the audio file
-    :return: vector of computed features
+    :return: DataFrame of computed features
     """
 
     mfcc, audio, fs = preprocess(audio_path)
 
     # iterating through the feature functions
     computed_features = np.zeros(len(features.feature_functions))
-    for i, func in enumerate(features.feature_functions):
+    for i, func_name in enumerate(sorted(features.feature_functions)):
+        func = features.feature_functions[func_name]
         computed_features[i] = func(mfcc, audio, fs)
 
     return computed_features
 
 
 def extract_all():
-    # TODO: implement pandas
     train_root = 'sources'
     classes = ['classical', 'country', 'disco', 'jazz']
 
     n_files = sum([len(files) for r, d, files in os.walk(train_root)])
-    train_set = np.zeros(n_files, len(features.feature_functions))
+    train_set = np.zeros((n_files, len(features.feature_functions)))
+    features_names = sorted(features.feature_functions)
     i = 0
     for cls in classes:
         folder_path = os.path.join(train_root, cls)
         audio_path_list = [os.path.join(folder_path, audio_path) for audio_path in os.listdir(folder_path)]
         for audio_path in audio_path_list:
-            # TODO: store the value of the class with pandas
             train_set[i] = extract_features(audio_path)
+            i += 1
 
-    return train_set
+    data_frame = pd.DataFrame(train_set, columns=features_names)
+
+    return data_frame
