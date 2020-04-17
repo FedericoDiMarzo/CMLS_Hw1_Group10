@@ -79,14 +79,23 @@ def extract_all():
     classes = ['classical', 'country', 'disco', 'jazz']
 
     n_files = sum([len(files) for r, d, files in os.walk(train_root)])
-    train_set = np.zeros((n_files, len(features.feature_functions)))
     features_names = sorted(features.feature_functions)
+    features_names.extend(classes)
+    number_of_features = len(features.feature_functions)
+    train_set = np.zeros((n_files, len(features_names)))
+
     i = 0
     for cls in classes:
         folder_path = os.path.join(train_root, cls)
         audio_path_list = [os.path.join(folder_path, audio_path) for audio_path in os.listdir(folder_path)]
         for audio_path in audio_path_list:
-            train_set[i] = extract_features(audio_path)
+            # calculates the features for a track
+            train_set[i, :number_of_features] = extract_features(audio_path)
+
+            # setting the label for the class
+            class_index = number_of_features + classes.index(cls)
+            train_set[i, class_index] = 1
+
             i += 1
 
     data_frame = pd.DataFrame(train_set, columns=features_names)
