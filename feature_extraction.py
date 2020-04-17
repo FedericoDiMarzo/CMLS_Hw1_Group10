@@ -4,6 +4,7 @@ import os
 import numpy as np
 import scipy as sp
 import pandas as pd
+import matplotlib.pyplot as plt
 
 
 def preprocess(audio_path):
@@ -21,9 +22,14 @@ def preprocess(audio_path):
     n_mels = 40
     n_cep = 12  # tipically 10-14
     window = 'hann'
+    fmin = 133.33
+    fmax = 6853.8
 
     # loading from the path
     audio, fs = librosa.load(audio_path, sr=None)  # TODO: do we need preprocessing?
+
+    # audio preprocessing
+    audio = audio / np.max(audio)
 
     # time domain windowing
     window = sp.signal.get_window(window=window, Nx=win_length)
@@ -34,18 +40,20 @@ def preprocess(audio_path):
         windowed_audio[i] = audio[i * hop_size:i * hop_size + win_length] * window
 
     # exctracting mfcc
-    stft = librosa.stft(
+    stft = np.abs(librosa.stft(
         y=audio,
         n_fft=n_fft,
         win_length=win_length,
         hop_length=hop_size,
-        window=window
-    ) ** 2
+        window=window,
+    )) ** 2
 
     mel_filter = librosa.filters.mel(
         sr=fs,
         n_fft=n_fft,
         n_mels=n_mels,
+        fmin=fmin,
+        fmax=fmax
     )
 
     mel_log_spectrogram = np.log10(np.dot(mel_filter, stft) + 1e-16)
