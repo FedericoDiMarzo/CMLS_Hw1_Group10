@@ -72,13 +72,13 @@ def extract_features(audio_path):
     :return: DataFrame of computed features
     """
 
-    mfcc, audio, fs = preprocess(audio_path)
+    stft, mfcc, windowed_audio, fs, = preprocess(audio_path)
 
     # iterating through the feature functions
     computed_features = np.zeros(len(features.feature_functions))
     for i, func_name in enumerate(sorted(features.feature_functions)):
         func = features.feature_functions[func_name]
-        computed_features[i] = func(mfcc, audio, fs)
+        computed_features[i] = func(stft, mfcc, windowed_audio, fs)
 
     return computed_features
 
