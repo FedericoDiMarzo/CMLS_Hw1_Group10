@@ -3,7 +3,7 @@ import scipy as sp
 import pandas as pd
 import feature_extraction
 import common
-import sklearn
+import sklearn.feature_selection
 
 
 def normalize_data(dataframe):
@@ -46,23 +46,31 @@ def normalize_data(dataframe):
 
 def select_features(dataframe, n_feat):
     # TODO: fine tune parameters
-    regularization_parameter = 1
-    kernel = 'poly'
-    poly_degree = 3
+    # regularization_parameter = 1
+    # kernel = 'poly'
+    # poly_degree = 3
 
-    # using smv as a classifier SVM
-    classifier = sklearn.svm.SVC(
-        C=regularization_parameter,
-        kernel=kernel,
-        degree=poly_degree
-    )
+    # inferring classifier from common module
+    # classifier = sklearn.svm.SVC(
+    #     C=regularization_parameter,
+    #     kernel=kernel,
+    #     degree=poly_degree
+    # )
 
+    classifier = common.classifier
+    # console output
+    if not classifier:
+        print('-- select_features aborted --',
+              'error: classifier is not defined',
+              sep='\n')
+        return
 
     # selecting features
-    selector = sklearn.feature_selection.RFE(classifier, n_feat)
+    selector = sklearn.feature_selection.RFE(classifier, common.n_feat)
     X, Y = common.dataframe_to_matrices(dataframe)
     selector.fit(X, Y)
 
+    # console output
     print('-- select_features completed --',
           'features selected: ' + str(n_feat),
           'rfe support: ',

@@ -18,15 +18,15 @@ def preprocess(audio_path):
     :return: (mfcc, windowed_audio, fs)
     """
     # TODO: fine tune these parameters
-    n_fft = 1024
-    win_length = 1024
-    hop_size = int(win_length / 2)
-    n_mels = 40
-    cep_start = features.cep_start
-    cep_end = features.cep_end
-    window = 'hann'
-    fmin = 133.33
-    fmax = 6853.8
+    n_fft = common.n_fft
+    win_length = common.win_length
+    hop_size = common.hop_size
+    n_mels = common.n_mels
+    cep_start = common.cep_start
+    cep_end = common.cep_end
+    window = common.window
+    fmin = common.fmin
+    fmax = common.fmax
 
     # loading from the path
     audio, fs = librosa.load(audio_path, sr=None)  # TODO: do we need preprocessing?
@@ -63,7 +63,7 @@ def preprocess(audio_path):
 
     mfcc = sp.fft.dct(mel_log_spectrogram, norm='ortho', axis=0)[cep_start:cep_end]
 
-    return stft, mfcc, windowed_audio, fs,
+    return stft, mfcc, windowed_audio, fs, audio
 
 
 def extract_features(audio_path):
@@ -75,13 +75,19 @@ def extract_features(audio_path):
     :return: DataFrame of computed features
     """
 
-    stft, mfcc, windowed_audio, fs, = preprocess(audio_path)
+    stft, mfcc, windowed_audio, fs, audio = preprocess(audio_path)
 
     # iterating through the feature functions
     computed_features = np.zeros(len(features.feature_functions))
     for i, func_name in enumerate(sorted(features.feature_functions)):
         func = features.feature_functions[func_name]
-        computed_features[i] = func(stft, mfcc, windowed_audio, fs)
+        computed_features[i] = func(
+            stft=stft,
+            mfcc=mfcc,
+            windowed_audio=windowed_audio,
+            fs=fs,
+            audio=audio
+        )
 
     return computed_features
 

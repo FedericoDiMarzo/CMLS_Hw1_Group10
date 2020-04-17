@@ -1,14 +1,8 @@
 import numpy as np
-import warnings
-import matplotlib.cbook
-
-warnings.filterwarnings("ignore", category=matplotlib.cbook.mplDeprecation)
-
-cep_start = 2
-cep_end = 14
+import common
 
 
-def feature1(stft, mfcc, windowed_audio, fs):
+def feature1(**kwargs):
     import random
     """
     Example of feature using both mfcc and windowed_audio
@@ -16,10 +10,13 @@ def feature1(stft, mfcc, windowed_audio, fs):
     return random.randint(0, 10)
 
 
-def zcr_mean(stft, mfcc, windowed_audio, fs):
+def zcr_mean(**kwargs):
     """
     Mean of the zero crossing rate for all the frames
     """
+    windowed_audio = kwargs['windowed_audio']
+    fs = kwargs['fs']
+
     N = windowed_audio.shape[0]
     zcr = np.abs(np.diff(windowed_audio, axis=0))
     zcr = np.sum(zcr, axis=0)
@@ -27,10 +24,12 @@ def zcr_mean(stft, mfcc, windowed_audio, fs):
     return np.mean(zcr)
 
 
-def spectral_centroid_mean(stft, mfcc, windowed_audio, fs):
+def spectral_centroid_mean(**kwargs):
     """
     Mean of the spectral centroid for all the frames
     """
+    stft = kwargs['stft']
+
     N = stft.shape[1]
     k = np.arange(1, stft.shape[0] + 1)
     k = np.transpose(np.tile(k, (N, 1)))
@@ -38,10 +37,12 @@ def spectral_centroid_mean(stft, mfcc, windowed_audio, fs):
     return np.mean(ctr)
 
 
-def spectral_decrease_mean(stft, mfcc, windowed_audio, fs):
+def spectral_decrease_mean(**kwargs):
     """
     Mean of the spectral decrease for all the frames
     """
+    stft = kwargs['stft']
+
     N = stft.shape[1]
     k = np.arange(1, stft.shape[0])
     k = np.transpose(np.tile(k, (N, 1)))
@@ -57,11 +58,12 @@ def mfcc_mean(cep_coef):
     :return: closure to _mfcc_mean
     """
 
-    def _mfcc_mean(stft, mfcc, windowed_audio, fs):
+    def _mfcc_mean(**kwargs):
         """
         Calculates the mean for a certain mfcc coefficient (cep_coef)
         """
-        return np.mean(mfcc, axis=1)[cep_coef - cep_start]
+        mfcc = kwargs['mfcc']
+        return np.mean(mfcc, axis=1)[cep_coef - common.cep_start]
 
     return _mfcc_mean
 
@@ -73,11 +75,12 @@ def mfcc_std(cep_coef):
     :return: closure to _mfcc_std
     """
 
-    def _mfcc_std(stft, mfcc, windowed_audio, fs):
+    def _mfcc_std(**kwargs):
         """
         Calculates the std for a certain mfcc coefficient (cep_coef)
         """
-        return np.std(mfcc, axis=1)[cep_coef - cep_start]
+        mfcc = kwargs['mfcc']
+        return np.std(mfcc, axis=1)[cep_coef - common.cep_start]
 
     return _mfcc_std
 
@@ -91,6 +94,6 @@ feature_functions = {
 }
 
 # Manually adding the features for every cep_coeffient
-for c in range(cep_start, cep_end):
+for c in range(common.cep_start, common.cep_end):
     feature_functions['mfcc_' + str(c) + '_mean'] = mfcc_mean(c)
     feature_functions['mfcc_' + str(c) + '_std'] = mfcc_std(c)
