@@ -66,6 +66,22 @@ def mfcc_mean(cep_coef):
     return _mfcc_mean
 
 
+def mfcc_std(cep_coef):
+    """
+    Closure for defining _mfcc_std for a certain coefficient
+    :param cep_coef: mfcc coefficient
+    :return: closure to _mfcc_std
+    """
+
+    def _mfcc_std(mfcc, windowed_audio, fs):
+        """
+        Calculates the std for a certain mfcc coefficient (cep_coef)
+        """
+        return np.std(mfcc, axis=1)[cep_coef - cep_start]
+
+    return _mfcc_std
+
+
 # Used to store feature name and function reference
 feature_functions = {
     'feature1': feature1,
@@ -77,3 +93,5 @@ feature_functions = {
 # Manually adding the features for every cep_coeffient
 for c in range(cep_start, cep_end):
     feature_functions['mfcc_' + str(c) + '_mean'] = mfcc_mean(c)
+    feature_functions['mfcc_' + str(c) + '_std'] = mfcc_std(c)
+
