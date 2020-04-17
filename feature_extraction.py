@@ -4,7 +4,9 @@ import os
 import numpy as np
 import scipy as sp
 import pandas as pd
+import time
 import matplotlib.pyplot as plt
+import common
 
 
 def preprocess(audio_path):
@@ -68,7 +70,8 @@ def extract_features(audio_path):
     """
     Calculates all features defined in features module for
     a certain target file.
-    :param url of the audio file
+
+    :param audio_path of the audio file
     :return: DataFrame of computed features
     """
 
@@ -84,17 +87,24 @@ def extract_features(audio_path):
 
 
 def extract_all():
+    """
+    Calculates the features for every source song.
+
+    :return: the whole DataFrame
+    """
+    # setting a timer to calculate function exectution time
+    timer_start = time.time()
+
     train_root = 'sources'
-    classes = ['classical', 'country', 'disco', 'jazz']
 
     n_files = sum([len(files) for r, d, files in os.walk(train_root)])
     features_names = sorted(features.feature_functions)
-    features_names.extend(classes)
+    features_names.extend(common.classes)
     number_of_features = len(features.feature_functions)
     train_set = np.zeros((n_files, len(features_names)))
 
     i = 0
-    for cls in classes:
+    for cls in common.classes:
         folder_path = os.path.join(train_root, cls)
         audio_path_list = [os.path.join(folder_path, audio_path) for audio_path in os.listdir(folder_path)]
         for audio_path in audio_path_list:
@@ -102,11 +112,22 @@ def extract_all():
             train_set[i, :number_of_features] = extract_features(audio_path)
 
             # setting the label for the class
-            class_index = number_of_features + classes.index(cls)
+            class_index = number_of_features + common.classes.index(cls)
             train_set[i, class_index] = 1
 
             i += 1
 
+        # console output
+        print('class ' + cls + ' extracted...')
+
     data_frame = pd.DataFrame(train_set, columns=features_names)
+
+    # console output
+    execution_time = timer_start - time.time()
+    print('-- feature_extraction completed --',
+          'tracks: ' + str(n_files),
+          'features: ' + str(number_of_features),
+          'execution time: ' + '{:.2f}'.format(execution_time) + 's',
+          sep="\n")
 
     return data_frame

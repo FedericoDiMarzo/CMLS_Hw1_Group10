@@ -1,14 +1,19 @@
 import numpy as np
+import warnings
+import matplotlib.cbook
+
+warnings.filterwarnings("ignore", category=matplotlib.cbook.mplDeprecation)
 
 cep_start = 2
 cep_end = 14
 
 
 def feature1(stft, mfcc, windowed_audio, fs):
+    import random
     """
     Example of feature using both mfcc and windowed_audio
     """
-    return 0
+    return random.randint(0, 10)
 
 
 def zcr_mean(stft, mfcc, windowed_audio, fs):
@@ -89,4 +94,3 @@ feature_functions = {
 for c in range(cep_start, cep_end):
     feature_functions['mfcc_' + str(c) + '_mean'] = mfcc_mean(c)
     feature_functions['mfcc_' + str(c) + '_std'] = mfcc_std(c)
-
