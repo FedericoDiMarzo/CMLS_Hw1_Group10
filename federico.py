@@ -11,7 +11,7 @@ data_frame.to_csv(os.path.join(root_path, 'test_data.csv'))
 
 filtered_frame = [data_frame[data_frame[cls] == 1] for cls in class_list]
 
-features = ['mfcc_2_mean', 'mfcc_3_mean', 'mfcc_4_mean', 'mfcc_13_mean']
+features = ['mfcc_2_mean', 'mfcc_3_mean', 'spectral_centroid_mean', 'spectral_decrease_mean']
 
 for i, feat in enumerate(features):
     for frame in filtered_frame:
