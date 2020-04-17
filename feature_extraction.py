@@ -20,7 +20,8 @@ def preprocess(audio_path):
     win_length = 1024
     hop_size = int(win_length / 2)
     n_mels = 40
-    n_cep = 12  # tipically 10-14
+    cep_start = 3
+    cep_end = 14
     window = 'hann'
     fmin = 133.33
     fmax = 6853.8
@@ -58,7 +59,7 @@ def preprocess(audio_path):
 
     mel_log_spectrogram = np.log10(np.dot(mel_filter, stft) + 1e-16)
 
-    mfcc = sp.fft.dct(mel_log_spectrogram, norm='ortho', axis=0)[1:n_cep + 1]
+    mfcc = sp.fft.dct(mel_log_spectrogram, norm='ortho', axis=0)[cep_start:cep_end]
 
     return mfcc, windowed_audio, fs,
 

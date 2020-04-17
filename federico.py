@@ -13,7 +13,7 @@ country = data_frame[data_frame['country'] == 1]
 disco = data_frame[data_frame['disco'] == 1]
 jazz = data_frame[data_frame['jazz'] == 1]
 
-feature = 'spectral_decrease_mean'
+feature = 'mfcc_3_mean'
 
 sns.distplot(classical[feature])
 sns.distplot(country[feature])

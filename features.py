@@ -1,5 +1,8 @@
 import numpy as np
 
+cep_start = 3
+cep_end = 14
+
 
 def feature1(mfcc, windowed_audio, fs):
     """
@@ -47,6 +50,22 @@ def spectral_decrease_mean(mfcc, windowed_audio, fs):
     return np.mean(sdc)
 
 
+def mfcc_mean(cep_coef):
+    """
+    Closure for defining _mfcc_mean for a certain coefficient
+    :param cep_coef: mfcc coefficient
+    :return: closure to _mfcc_mean
+    """
+
+    def _mfcc_mean(mfcc, windowed_audio, fs):
+        """
+        Calculates the mean for a certain mfcc coefficient (cep_coef)
+        """
+        return np.mean(mfcc, axis=1)[cep_coef - cep_start]
+
+    return _mfcc_mean
+
+
 # Used to store feature name and function reference
 feature_functions = {
     'feature1': feature1,
@@ -54,3 +73,7 @@ feature_functions = {
     'spectral_centroid_mean': spectral_centroid_mean,
     'spectral_decrease_mean': spectral_decrease_mean
 }
+
+# Manually adding the features for every cep_coeffient
+for c in range(cep_start, cep_end):
+    feature_functions['mfcc_' + str(c) + '_mean'] = mfcc_mean(c)
