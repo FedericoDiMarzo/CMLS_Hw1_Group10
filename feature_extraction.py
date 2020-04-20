@@ -105,12 +105,12 @@ def extract_all():
 
     n_files = sum([len(files) for r, d, files in os.walk(train_root)])
     features_names = sorted(features.feature_functions)
-    features_names.extend(common.classes)
+    features_names.append('CLASS')
     number_of_features = len(features.feature_functions)
     train_set = np.zeros((n_files, len(features_names)))
 
     i = 0
-    for cls in common.classes:
+    for cls_index, cls in enumerate(common.classes):
         folder_path = os.path.join(train_root, cls)
         audio_path_list = [os.path.join(folder_path, audio_path) for audio_path in os.listdir(folder_path)]
         for audio_path in audio_path_list:
@@ -118,8 +118,7 @@ def extract_all():
             train_set[i, :number_of_features] = extract_features(audio_path)
 
             # setting the label for the class
-            class_index = number_of_features + common.classes.index(cls)
-            train_set[i, class_index] = 1
+            train_set[i, -1] = cls_index
 
             i += 1
 
@@ -130,10 +129,12 @@ def extract_all():
 
     # console output
     execution_time = timer_start - time.time()
-    print('-- feature_extraction completed --',
+    print('',
+          '-- feature_extraction completed --',
           'tracks: ' + str(n_files),
           'features: ' + str(number_of_features),
           'execution time: ' + '{:.2f}'.format(execution_time) + 's',
+          '',
           sep="\n")
 
     return data_frame

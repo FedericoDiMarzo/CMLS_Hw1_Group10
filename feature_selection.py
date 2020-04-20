@@ -1,80 +1,43 @@
 import numpy as np
 import scipy as sp
 import pandas as pd
-import feature_extraction
 import common
-import sklearn.feature_selection
+from sklearn.feature_selection import VarianceThreshold
 
 
-def normalize_data(dataframe):
+def select_features(dataframe):
     """
-    Removes bad data and
-    applies a standardization to a DataFrame.
+    Variance selection of the features
 
-    :param dataframe: target
-    :return: standardized DataFrame
+    :param dataframe: input dataframe
+    :return: filtered dataframe
     """
-    dataframe_clean = dataframe.dropna()  # removing bad data first
+    original_features = len(dataframe.columns)
 
-    x = dataframe_clean.values
-    feature_names = dataframe.columns
-    N = x.shape[0]
-    mean = np.mean(x, axis=0)
-    std = np.std(x, axis=0)
+    # extracting X and y
+    X, y = common.split_Xy(dataframe.values)
 
-    # excluding classes columns
-    mean[len(feature_names) - len(common.classes):len(feature_names)] = 0
-    std[len(feature_names) - len(common.classes):len(feature_names)] = 1
-
-    # tile is used to keep the same dimensions
-    mean = np.tile(mean, (N, 1))
-    std = np.tile(std, (N, 1))
-
-    # normalizing data with standardization
-    # TODO: https://sebastianraschka.com/Articles/2014_about_feature_scaling.html#standardizing-and-normalizing---how-it-can-be-done-using-scikit-learn
-    x_norm = (x - mean) / std
-    normalized_dataframe = pd.DataFrame(x_norm, columns=feature_names)
+    # variance selection
+    variance_selector = VarianceThreshold(common.min_var)
+    variance_selector.fit(X, y)
+    indices = variance_selector.get_support(indices=True)
+    features_selected = [dataframe.columns[i] for i in np.nditer(indices)]
+    X_new = variance_selector.transform(X)
 
     # console output
-    print('-- normalize_data completed --',
-          'corrupted entries: ' + str(len(dataframe.index) - N),
-          'updated entries: ' + str(N),
-          sep="\n")
-
-    return normalized_dataframe
-
-
-def select_features(dataframe, n_feat):
-    # TODO: fine tune parameters
-    # regularization_parameter = 1
-    # kernel = 'poly'
-    # poly_degree = 3
-
-    # inferring classifier from common module
-    # classifier = sklearn.svm.SVC(
-    #     C=regularization_parameter,
-    #     kernel=kernel,
-    #     degree=poly_degree
-    # )
-
-    classifier = common.classifier
-    # console output
-    if not classifier:
-        print('-- select_features aborted --',
-              'error: classifier is not defined',
-              sep='\n')
-        return
-
-    # selecting features
-    selector = sklearn.feature_selection.RFE(classifier, common.n_feat)
-    X, Y = common.dataframe_to_matrices(dataframe)
-    selector.fit(X, Y)
-
-    # console output
-    print('-- select_features completed --',
-          'features selected: ' + str(n_feat),
-          'rfe support: ',
-          selector.support_,
-          'rfe ranking: ',
-          selector.ranking_,
+    print('-- select_features completed--',
+          'variance threshold: ' + str(common.min_var),
+          'original features: ' + str(original_features),
+          'filtered features: ' + str(len(features_selected)),
+          '',
+          'features selected:',
           sep='\n')
+
+    for feat in features_selected:
+        print(feat)
+
+    print()  # just a newrow for the console
+    new_columns = features_selected + ['CLASS']
+    new_dataframe = pd.DataFrame(common.merge_Xy(X_new, y),
+                                 columns=new_columns)
+    return new_dataframe
