@@ -7,16 +7,17 @@ import feature_selection
 root_path = 'resources\dataframes'
 class_list = ['classical', 'country', 'disco', 'jazz']
 
-data_frame = extract_all()
-data_frame = feature_selection.normalize_data(data_frame)
-data_frame.to_csv(os.path.join(root_path, 'normalized_data.csv'))
+dataframe_path = os.path.join('resources', 'dataframes')
 
-filtered_frame = [data_frame[data_frame[cls] == 1] for cls in class_list]
+dataframe = extract_all()
+dataframe.to_csv(os.path.join(dataframe_path, 'extracted_data.csv'), index=False)
+
 colorlist=["k","r","y","b"]
 def plot_features(features_list):
     #features = ['mfcc_2_mean', 'mfcc_3_mean', 'mfcc_4_mean', 'mfcc_5_mean']
     for f, feat in enumerate(features_list):
-        for g,frame in enumerate(filtered_frame):
+        for g in range(0,4):
+            frame=dataframe[dataframe.CLASS == g]
             plt.subplot(2, 2, 1 + f, label=features_list[f])
             sns.distplot(frame[feat],color=colorlist[g])
     plt.show()

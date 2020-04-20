@@ -36,6 +36,16 @@ def spectral_centroid_mean(**kwargs):
     ctr = np.sum(k * stft, axis=0) / np.sum(stft, axis=0)
     return np.mean(ctr)
 
+def spectral_flux(**kwargs):
+    fs = kwargs['fs']
+    magnitude_spectrum = kwargs['stft']
+    # convert to frequency domain
+    timebins, freqbins = np.shape(magnitude_spectrum)
+    # when do these blocks begin (time in seconds)?
+    timestamps = (np.arange(0, timebins - 1) * (timebins / float(fs)))
+    sf = np.sqrt(np.sum(np.diff(np.abs(magnitude_spectrum)) ** 2, axis=1)) / freqbins
+    return np.mean(sf[1:])
+
 
 def spectral_decrease_mean(**kwargs):
     """
@@ -90,7 +100,9 @@ feature_functions = {
     'feature1': feature1,
     'zcr_mean': zcr_mean,
     'spectral_centroid_mean': spectral_centroid_mean,
-    'spectral_decrease_mean': spectral_decrease_mean
+    'spectral_decrease_mean': spectral_decrease_mean,
+    'spectral_flux': spectral_flux
+
 }
 
 # Manually adding the features for every cep_coeffient
