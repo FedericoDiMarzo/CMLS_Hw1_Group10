@@ -38,13 +38,23 @@ def spectral_centroid_mean(**kwargs):
 
 def spectral_flux(**kwargs):
     fs = kwargs['fs']
-    magnitude_spectrum = kwargs['stft']
-    # convert to frequency domain
-    timebins, freqbins = np.shape(magnitude_spectrum)
-    # when do these blocks begin (time in seconds)?
-    timestamps = (np.arange(0, timebins - 1) * (timebins / float(fs)))
-    sf = np.sqrt(np.sum(np.diff(np.abs(magnitude_spectrum)) ** 2, axis=1)) / freqbins
-    return np.mean(sf[1:])
+    stft = kwargs['stft'] #stft being already a power spectrum (**2 in common)
+    freqbins,N = np.shape(stft)
+    sf = np.sqrt(np.sum(np.diff(np.abs(stft))**2, axis=1)) / freqbins #513 differences² calculated
+    return np.mean(sf)
+
+def spectral_rolloff(**kwargs):
+    fs = kwargs['fs']
+    stft = kwargs['stft']
+    k = 0.85
+    freqbins,N = np.shape(stft)
+    spectralSum = np.sum(stft, axis=1) #513x1 for the whole song
+    # find frequency-bin indices where the cumulative sum of all bins is higher
+    # than k-percent of the sum of all bins. Lowest index = Rolloff
+    sr = np.where(np.cumsum(spectralSum) >= k * sum(spectralSum))[0][0]
+    # convert frequency-bin index to frequency in Hz
+    sr = (sr / freqbins) * (fs / 2.0)
+    return sr
 
 
 def spectral_decrease_mean(**kwargs):
@@ -59,6 +69,7 @@ def spectral_decrease_mean(**kwargs):
     sdc = np.diff(np.abs(stft), axis=0) / k
     sdc = np.sum(sdc, axis=0) / np.sum(stft, axis=0)
     return np.mean(sdc)
+
 
 
 def mfcc_mean(cep_coef):
@@ -101,7 +112,10 @@ feature_functions = {
     'zcr_mean': zcr_mean,
     'spectral_centroid_mean': spectral_centroid_mean,
     'spectral_decrease_mean': spectral_decrease_mean,
-    'spectral_flux': spectral_flux
+    'spectral_flux': spectral_flux,
+    'spectral_rolloff': spectral_rolloff
+
+
 
 }
 

@@ -1,3 +1,5 @@
+"User can plot 4 features writting plot_features( ['mfcc_3_mean', 'an_other_feature_name'.. ] )"
+
 import os
 import seaborn as sns
 import matplotlib.pyplot as plt
