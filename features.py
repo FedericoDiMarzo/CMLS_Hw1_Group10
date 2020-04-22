@@ -70,6 +70,11 @@ def spectral_decrease_mean(**kwargs):
     sdc = np.sum(sdc, axis=0) / np.sum(stft, axis=0)
     return np.mean(sdc)
 
+def chroma_freq():
+    # NOT COMPLETE
+    x, sr = librosa.load(audio_path)
+    hop_length = 512
+    chromagram = librosa.feature.chroma_stft(x, sr=sr, hop_length=hop_length)
 
 
 def mfcc_mean(cep_coef):
