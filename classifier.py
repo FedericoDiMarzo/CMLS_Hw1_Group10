@@ -19,6 +19,8 @@ def test_classifier(X_test, y_test):
     print('-- test_classifier --',
           'classifier: ' + common.classifier_type,
           'score: ' + str(common.classifier.score(X_test, y_test)),
+          'confusion matrix: classical - country - disco - jazz ',
+          str(sklearn.metrics.confusion_matrix(y_test,common.classifier.predict(X_test))),
           sep='\n')
 
 
