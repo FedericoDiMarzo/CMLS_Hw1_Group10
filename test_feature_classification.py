@@ -5,6 +5,7 @@ from feature_selection import select_features
 from classifier import set_classifier, test_classifier
 import pandas as pd
 import common
+from Xy_train_test import get_Xy_train_test
 
 dataframe_folder = os.path.join('resources', 'dataframes')
 
@@ -16,13 +17,18 @@ dataframe = pd.read_csv(dataframe_path)
 dataframe = clean_data(dataframe)
 dataframe = DataNormalizer(dataframe).transform(dataframe)
 
+
+''' OBSOLETE NOW
 # splitting train and test data
 X, y = common.split_Xy(dataframe.values)
 X_train, X_test, y_train, y_test = train_test_split(X, y)
-
+'''
 # selecting the best features
 dataframe = select_features(dataframe)
 dataframe.to_csv(os.path.join(dataframe_folder, 'selected_features.csv'))
+
+# building training and testing dataset
+X_train,X_test,y_train,y_test=get_Xy_train_test()
 
 # defining the classifier
 set_classifier(X_train, y_train, classifier_type='svm')
