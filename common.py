@@ -4,8 +4,8 @@ classes = ['classical', 'country', 'disco', 'jazz']
 
 cep_start = 2  # mel coefficient start
 cep_end = 14  # mel coefficient end
-n_fft = 1024  # lenght fft
-win_length = 1024  # window lenght
+n_fft = 2**9  # lenght fft
+win_length = n_fft  # window lenght
 hop_size = int(win_length / 2)  # hop size
 window = 'hann'  # type of window
 
@@ -20,9 +20,9 @@ normalization_type = 'minmax'  # type of normalization
 
 classifier = None  # classifier used
 classifier_type = 'svm'  # string for the classifier used
-regularization_parameter = 0.6  # regularization parameter for the classifier
+regularization_parameter = 0.5  # regularization parameter for the classifier
 kernel = 'poly'  # type of kernel for SVM
-poly_degree = 3  # order of the polynomial for poly kernel
+poly_degree = 5  # order of the polynomial for poly kernel
 
 
 def split_Xy(Z):

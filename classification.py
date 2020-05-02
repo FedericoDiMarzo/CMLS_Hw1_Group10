@@ -61,9 +61,9 @@ def cross_validation(X, y, k=10):
 
 def svm():
     # console output
+    poly_order = str(common.poly_degree) if common.kernel == 'poly' else ''
     print('C: ' + str(common.regularization_parameter),
-          'kernel: ' + str(common.kernel) +
-          str(common.poly_degree) if common.kernel == 'poly' else '',
+          'kernel: ' + str(common.kernel) + poly_order,
           '',
           sep='\n')
 
