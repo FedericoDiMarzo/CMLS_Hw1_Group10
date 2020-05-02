@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from common import split_Xy
 import common
+import os
 from sklearn import multiclass
 
 'BELOW : 2 EQUIVALENT METHODS   the n°1 builds manually 6 classifiers, the n°2 uses OneVsOne '
@@ -23,7 +24,7 @@ clf_23 = sklearn.svm.SVC(**SVM_parameters, probability=True)
 OneVsOne = sklearn.multiclass.OneVsOneClassifier(sklearn.svm.SVC(kernel = 'rbf'))
 
 'PROCESSING DATAS FOR THE 6 CLASSIFIERS'
-dataframe_mv = pd.read_csv('resources\\dataframes\\selected_features.csv')
+dataframe_mv = pd.read_csv(os.path.join('resources', 'dataframes', 'selected_features.csv'))
 X_mv,y_mv=split_Xy(dataframe_mv.values)
 X_train, X_test, y_train, y_test = train_test_split(X_mv, y_mv)
 

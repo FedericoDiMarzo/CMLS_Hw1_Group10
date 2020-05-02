@@ -1,8 +1,7 @@
 import numpy as np
-import scipy as sp
-import pandas as pd
-import common
-import sklearn.feature_selection
+from sklearn import preprocessing
+
+import Xy_train_test
 
 
 def clean_data(dataframe):
@@ -26,33 +25,47 @@ class DataNormalizer:
 
     def __init__(self, train_data):
         """
-        Extract mean and std from train_data, in order to
+        Extracts mean, std, min_feat, max_feat from train_data, in order to
         prepare for normalization
 
         :param train_data: target
         """
-        x = train_data.values
-        feature_names = train_data.columns
-        N = x.shape[0]
-        self.mean = np.mean(x, axis=0)
-        self.std = np.std(x, axis=0)
 
-        # excluding classes columns
-        self.mean[len(feature_names) - len(common.classes):len(feature_names)] = 0
-        self.std[len(feature_names) - len(common.classes):len(feature_names)] = 1
+        # min_feat and max_feat are used for minmax2
+        self.min_feat = np.min(train_data, axis=0)
+        self.max_feat = np.max(train_data, axis=0)
 
-        # tile is used to keep the same dimensions
-        self.mean = np.tile(self.mean, (N, 1))
-        self.std = np.tile(self.std, (N, 1))
+        # defining all the possible Scalers
+        self.minmax_scaler = preprocessing.MinMaxScaler().fit(train_data)
+        self.standardization_scaler = preprocessing.StandardScaler().fit(train_data)
 
-    def transform(self, dataframe):
+    def transform(self, X_train, X_test, type='minmax'):
         """
-        Applying standardization to a DataFrame
+        Applying normalization to a DataFrame
         # TODO: https://sebastianraschka.com/Articles/2014_about_feature_scaling.html#standardizing-and-normalizing---how-it-can-be-done-using-scikit-learn
 
-        :param dataframe: target
-        :return: normalized DataFrame
+        :param X_train
+        :param X_test
+        :param type: type of normalization
+        :return: (X_train_transformed, X_test_transformed, y_train, y_test)
         """
-        X = dataframe.values
-        X_trasformed = (X - self.mean) / self.std
-        return pd.DataFrame(X_trasformed, columns=dataframe.columns)
+        X_train_transformed = None
+        X_test_transformed = None
+
+        if type == 'minmax':
+            X_train_transformed = self.minmax_scaler.transform(X_train)
+            X_test_transformed = self.minmax_scaler.transform(X_test)
+        elif type == 'minmax2':
+            X_train_transformed = (X_train - self.min_feat) / (self.max_feat - self.min_feat)
+            X_test_transformed = (X_test - self.min_feat) / (self.max_feat - self.min_feat)
+        elif type == 'standardization':
+            X_train_transformed = self.standardization_scaler.transform(X_train)
+            X_test_transformed = self.standardization_scaler.transform(X_test)
+        else:
+            # console output
+            print('-- DataNormalizer.transform error --',
+                  'type not recognized',
+                  '',
+                  sep="\n")
+
+        return X_train_transformed, X_test_transformed

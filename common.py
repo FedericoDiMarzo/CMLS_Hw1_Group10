@@ -13,12 +13,14 @@ n_mels = 40  # order of mel filter
 fmin = 133.33  # mel filter freq min
 fmax = 6853.8  # mel filter freq max
 
-n_feat = 10  # target feat number
-min_var = 1  # variance threshold for feats
+n_features = 10  # target feat number
+min_var = 0.6  # variance threshold for feats
+
+normalization_type = 'minmax'  # type of normalization
 
 classifier = None  # classifier used
-classifier_type = ''  # string for the classifier used
-regularization_parameter = 1  # regularization parameter for the classifier
+classifier_type = 'svm'  # string for the classifier used
+regularization_parameter = 0.6  # regularization parameter for the classifier
 kernel = 'poly'  # type of kernel for SVM
 poly_degree = 3  # order of the polynomial for poly kernel
 

@@ -63,7 +63,7 @@ def preprocess(audio_path):
 
     mfcc = sp.fft.dct(mel_log_spectrogram, norm='ortho', axis=0)[cep_start:cep_end]
 
-    return stft, mfcc, windowed_audio, fs, audio
+    return stft, mfcc, windowed_audio, fs, audio, mel_log_spectrogram
 
 
 def extract_features(audio_path):
@@ -75,7 +75,7 @@ def extract_features(audio_path):
     :return: DataFrame of computed features
     """
 
-    stft, mfcc, windowed_audio, fs, audio = preprocess(audio_path)
+    stft, mfcc, windowed_audio, fs, audio, mel_log_spectrogram = preprocess(audio_path)
 
     # iterating through the feature functions
     computed_features = np.zeros(len(features.feature_functions))
@@ -86,7 +86,8 @@ def extract_features(audio_path):
             mfcc=mfcc,
             windowed_audio=windowed_audio,
             fs=fs,
-            audio=audio
+            audio=audio,
+            mel_log_spectrogram=mel_log_spectrogram
         )
 
     return computed_features
@@ -128,7 +129,7 @@ def extract_all():
     data_frame = pd.DataFrame(train_set, columns=features_names)
 
     # console output
-    execution_time = timer_start - time.time()
+    execution_time = time.time() - timer_start
     print('',
           '-- feature_extraction completed --',
           'tracks: ' + str(n_files),

@@ -2,14 +2,19 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from common import split_Xy
+import classification
+import os
 
 '''
 This code provides : X_train_normalized, X_test_normalized, y_train, y_test
 
 It also calculates X/y_train/test_i for each i class, for potential simulations
 '''
+
+
 def get_Xy_train_test():
-    dataframe_mv = pd.read_csv('resources\\dataframes\\selected_features.csv')
+    dataframe_mv = pd.read_csv(os.path.join('resources', 'dataframes', 'selected_features.csv'))
+    # dataframe_mv = pd.read_csv(os.path.join('resources', 'dataframes', 'extracted_data.csv'))
     X, y = split_Xy(dataframe_mv.values)
     X_train, X_test, y_train, y_test = train_test_split(X, y)
 
@@ -53,4 +58,4 @@ def get_Xy_train_test():
         (X_test_0_normalized, X_test_1_normalized, X_test_2_normalized, X_test_3_normalized), axis=0)  #
     X_train_normalized = np.concatenate(
         (X_train_0_normalized, X_train_1_normalized, X_train_2_normalized, X_train_3_normalized), axis=0)  #
-    return(X_train_normalized, X_test_normalized, y_train, y_test)
+    return (X_train_normalized, X_test_normalized, y_train, y_test)

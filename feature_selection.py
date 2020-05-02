@@ -2,10 +2,12 @@ import numpy as np
 import scipy as sp
 import pandas as pd
 import common
-from sklearn.feature_selection import VarianceThreshold
+import classification
+from sklearn.feature_selection import RFE, VarianceThreshold
+from sklearn.svm import SVC
 
 
-def select_features(dataframe):
+def select_features(dataframe, n_features):
     """
     Variance selection of the features
 
@@ -23,6 +25,18 @@ def select_features(dataframe):
     indices = variance_selector.get_support(indices=True)
     features_selected = [dataframe.columns[i] for i in np.nditer(indices)]
     X_new = variance_selector.transform(X)
+
+    # recursive feature selection
+    # cls = classifier.svm()
+    # rfe_selector = RFE(
+    #     estimator=cls,
+    #     n_features_to_select=common.n_features,
+    #     verbose=1
+    # )
+    # rfe_selector.fit(X, y.ravel())
+    # indices = rfe_selector.get_support(indices=True)
+    # features_selected = [dataframe.columns[i] for i in np.nditer(indices)]
+    # X_new = rfe_selector.transform(X)
 
     # console output
     print('-- select_features completed--',
