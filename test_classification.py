@@ -20,6 +20,7 @@ hyperparameters = {
     'poly_degree': [2, 3, 4, 5]
 }
 
+# flag for the hyperparameter optimization
 optimize_hyperparameters = True
 
 # reading data
