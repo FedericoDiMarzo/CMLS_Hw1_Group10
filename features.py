@@ -4,17 +4,9 @@ import common
 import librosa
 
 
-# def feature1(**kwargs):
-#     import random
-#     """
-#     Example of feature using both mfcc and windowed_audio
-#     """
-#     return random.randint(0, 10)
-
-
-def zcr_mean(**kwargs):
+def zcr(**kwargs):
     """
-    Mean of the zero crossing rate for all the frames
+    Calculates the zero crossing rate vector
     """
     windowed_audio = kwargs['windowed_audio']
     fs = kwargs['fs']
@@ -23,7 +15,63 @@ def zcr_mean(**kwargs):
     zcr = np.abs(np.diff(windowed_audio, axis=0))
     zcr = np.sum(zcr, axis=0)
     zcr *= 1 / (2 * N) * fs
-    return np.mean(zcr)
+    return zcr
+
+
+def centroid(X):
+    """
+    Calculates the centroid vector from the matrix X
+    :param X: time-frequency input matrix
+    :return: centroid vector, containing the centroid for every column
+    """
+    n_frames = X.shape[1]
+    k = np.arange(X.shape[0])
+    k = np.reshape(k, (-1, 1))
+    k = np.repeat(k, n_frames, axis=1)
+    return np.sum(np.abs(X) * k, axis=0) / np.sum(X, axis=0)
+
+
+def spectral_flux(X):
+    """
+    Calculates the spectral flux vector from the matrix X
+    :param X: time-frequency input matrix
+    :return: spectral flux vector, containing the spectral flux for every column
+    """
+    freqbins = X.shape[0]
+    return np.sqrt(np.sum(np.diff(np.abs(X)) ** 2, axis=1)) / freqbins
+
+
+def spectral_spread(X):
+    """
+    Calculates the spectral spread vector from the matrix X
+    :param X: time-frequency input matrix
+    :return: spectral flux vector, containing the spectral spread for every column
+    """
+    k = np.arange(X.shape[0])
+    k = np.reshape(k, (-1, 1))
+    k = np.repeat(k, X.shape[1], axis=1)
+    ctr = centroid(X)
+    ctr = np.reshape(ctr, (-1, 1))
+    ctr = np.repeat(ctr, len(k), axis=1)
+    ctr = np.transpose(ctr)  # to get the right sizes
+
+    return np.sum(((k - ctr) ** 2) * X) / np.sum(X)
+
+
+def zcr_mean(**kwargs):
+    """
+    Mean of the zero crossing rate for all the frames
+    """
+    zero_crossing_rate = zcr(**kwargs)
+    return np.mean(zero_crossing_rate)
+
+
+def zcr_std(**kwargs):
+    """
+    Standard variation of the zero crossing rate for all the frames
+    """
+    zero_crossing_rate = zcr(**kwargs)
+    return np.std(zero_crossing_rate)
 
 
 def spectral_centroid_mean(**kwargs):
@@ -31,23 +79,29 @@ def spectral_centroid_mean(**kwargs):
     Mean of the spectral centroid for all the frames
     """
     stft = kwargs['stft']
-
-    N = stft.shape[1]
-    k = np.arange(1, stft.shape[0] + 1)
-    k = np.transpose(np.tile(k, (N, 1)))
-    ctr = np.sum(k * stft, axis=0) / np.sum(stft, axis=0)
-    return np.mean(ctr)
+    return np.mean(centroid(stft))
 
 
-def spectral_flux(**kwargs):
-    fs = kwargs['fs']
+def spectral_flux_mean(**kwargs):
+    """
+    Mean of the spectral flux for all the frames
+    """
     stft = kwargs['stft']  # stft being already a power spectrum (**2 in common)
-    freqbins, N = np.shape(stft)
-    sf = np.sqrt(np.sum(np.diff(np.abs(stft)) ** 2, axis=1)) / freqbins  # 513 differences² calculated
-    return np.mean(sf)
+    return np.mean(spectral_flux(stft))
 
 
-def spectral_rolloff(**kwargs):
+def spectral_spread_mean(**kwargs):
+    """
+    Mean of the spectral spread for all the frames
+    """
+    stft = kwargs['stft']  # stft being already a power spectrum (**2 in common)
+    return np.mean(spectral_spread(stft))
+
+
+def spectral_rolloff_mean(**kwargs):
+    """
+    Mean of the spectral roll-off for all the frames
+    """
     fs = kwargs['fs']
     stft = kwargs['stft']
     k = 0.85
@@ -155,24 +209,113 @@ def mfcc_std(cep_coef):
         Calculates the std for a certain mfcc coefficient (cep_coef)
         """
         mfcc = kwargs['mfcc']
-        return np.std(mfcc, axis=1)[cep_coef - common.cep_start]
+        x = mfcc[cep_coef]
+        return np.std(x)
 
     return _mfcc_std
+
+
+def chroma_mean(chroma_coef):
+    """
+    Closure for defining _chroma_mean for a certain coefficient
+    :param chroma_coef: chroma coefficient
+    :return: closure to _chroma_mean
+    """
+
+    def _chroma_mean(**kwargs):
+        """
+        Calculates the mean for a certain chroma coefficient
+        """
+        chroma_spectrum = kwargs['chroma_spectrum']
+        x = chroma_spectrum[chroma_coef]
+        return np.mean(x)
+
+    return _chroma_mean
+
+
+def chroma_std(chroma_coef):
+    """
+    Closure for defining _chroma_std for a certain coefficient
+    :param chroma_coef: chroma coefficient
+    :return: closure to _chroma_std
+    """
+
+    def _chroma_std(**kwargs):
+        """
+        Calculates the standard deviation for a certain chroma coefficient
+        """
+        chroma_spectrum = kwargs['chroma_spectrum']
+        x = chroma_spectrum[chroma_coef]
+        return np.std(x)
+
+    return _chroma_std
+
+
+def chroma_centroid_mean(**kwargs):
+    """
+    Calculates the mean of centroid for the chroma spectrum
+    """
+    chroma_spectrum = kwargs['chroma_spectrum']
+    return np.mean(centroid(chroma_spectrum))
+
+
+def chroma_flux_mean(**kwargs):
+    """
+    Calculates the mean of spectral flux for the chroma spectrum
+    """
+    chroma_spectrum = kwargs['chroma_spectrum']
+    return np.mean(spectral_flux(chroma_spectrum))
+
+
+def chroma_spread_mean(**kwargs):
+    """
+    Calculates the mean of spectral spread for the chroma spectrum
+    """
+    chroma_spectrum = kwargs['chroma_spectrum']
+    return np.mean(spectral_spread(chroma_spectrum))
+
+
+def chroma_max(**kwargs):
+    """
+    Calculates the max chroma bin
+    """
+    chroma_spectrum = kwargs['chroma_spectrum']
+    return np.max(chroma_spectrum.flatten())
+
+
+def chroma_min(**kwargs):
+    """
+    Calculates the min chroma bin
+    """
+    chroma_spectrum = kwargs['chroma_spectrum']
+    return np.min(chroma_spectrum.flatten())
 
 
 # Used to store feature name and function reference
 feature_functions = {
     'zcr_mean': zcr_mean,
+    'zcr_std': zcr_std,
     'spectral_centroid_mean': spectral_centroid_mean,
     'spectral_decrease_mean': spectral_decrease_mean,
-    'spectral_flux': spectral_flux,
-    'spectral_rolloff': spectral_rolloff,
+    'spectral_flux_mean': spectral_flux_mean,
+    'spectral_rolloff_mean': spectral_rolloff_mean,
+    'spectral_spread_mean': spectral_spread_mean,
     'onset_rate_low': onset_events('lowpass'),
     'onset_rate_high': onset_events('highpass'),
+    'chroma_max': chroma_max,
+    'chroma_min': chroma_min,
+    'chroma_centroid_mean': chroma_centroid_mean,
+    'chroma_flux_mean': chroma_flux_mean,
+    'chroma_spread_mean': chroma_spread_mean,
 
 }
 
 # Manually adding the features for every cep_coeffient
-for c in range(common.cep_start, common.cep_end):
-    feature_functions['mfcc_' + str(c) + '_mean'] = mfcc_mean(c)
-    feature_functions['mfcc_' + str(c) + '_std'] = mfcc_std(c)
+for c in range(common.cep_end - common.cep_start):
+    feature_functions['mfcc_' + str(c + common.cep_start) + '_mean'] = mfcc_mean(c)
+    feature_functions['mfcc_' + str(c + common.cep_start) + '_std'] = mfcc_std(c)
+
+# Manually adding the features for every chroma
+for c in range(12):
+    feature_functions['chroma_' + str(c) + '_mean'] = chroma_mean(c)
+    feature_functions['chroma_' + str(c) + '_std'] = chroma_std(c)

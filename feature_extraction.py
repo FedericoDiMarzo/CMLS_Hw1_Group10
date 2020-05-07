@@ -37,10 +37,9 @@ def preprocess(audio_path):
     # time domain windowing
     window = sp.signal.get_window(window=window, Nx=win_length)
     n_window = int(np.floor((len(audio) - win_length) / hop_size))
-    windowed_audio = np.zeros((n_window, win_length))
-
+    windowed_audio = np.zeros((win_length, n_window))
     for i in range(n_window):
-        windowed_audio[i] = audio[i * hop_size:i * hop_size + win_length] * window
+        windowed_audio[:, i] = audio[i * hop_size:i * hop_size + win_length] * window
 
     # exctracting mfcc
     stft = np.abs(librosa.stft(
@@ -58,12 +57,17 @@ def preprocess(audio_path):
         fmin=fmin,
         fmax=fmax
     )
+    mel_log_spectrogram = np.log10(np.dot(mel_filter, stft) + 1e-16)  # logarithmic compression
+    mfcc = sp.fft.dct(mel_log_spectrogram, norm='ortho', axis=0)[cep_start:cep_end]  # discarding unused coefficients
 
-    mel_log_spectrogram = np.log10(np.dot(mel_filter, stft) + 1e-16)
+    # extracting chromagram
+    chroma_filter = librosa.filters.chroma(
+        sr=fs,
+        n_fft=n_fft
+    )
+    chroma_spectrum = np.dot(chroma_filter, stft)
 
-    mfcc = sp.fft.dct(mel_log_spectrogram, norm='ortho', axis=0)[cep_start:cep_end]
-
-    return stft, mfcc, windowed_audio, fs, audio, mel_log_spectrogram
+    return stft, mfcc, windowed_audio, fs, audio, mel_log_spectrogram, chroma_spectrum
 
 
 def extract_features(audio_path):
@@ -75,19 +79,24 @@ def extract_features(audio_path):
     :return: DataFrame of computed features
     """
 
-    stft, mfcc, windowed_audio, fs, audio, mel_log_spectrogram = preprocess(audio_path)
+    # exctracting the preliminary information from the song
+    stft, mfcc, windowed_audio, fs, audio, \
+        mel_log_spectrogram, chroma_spectrum = preprocess(audio_path)
 
     # iterating through the feature functions
     computed_features = np.zeros(len(features.feature_functions))
     for i, func_name in enumerate(sorted(features.feature_functions)):
         func = features.feature_functions[func_name]
+
+        # calling the selected feature function
         computed_features[i] = func(
             stft=stft,
             mfcc=mfcc,
             windowed_audio=windowed_audio,
             fs=fs,
             audio=audio,
-            mel_log_spectrogram=mel_log_spectrogram
+            mel_log_spectrogram=mel_log_spectrogram,
+            chroma_spectrum=chroma_spectrum
         )
 
     return computed_features

@@ -7,17 +7,19 @@ from sklearn.feature_selection import RFE, VarianceThreshold
 from sklearn.svm import SVC
 
 
-def select_features(dataframe, n_features):
+def select_features(X, dataframe, verbose=False):
     """
     Variance selection of the features
 
-    :param dataframe: input dataframe
-    :return: filtered dataframe
+    :param X: input data
+    :param dataframe
+    :param verbose: filters the console output
+    :return: filter mask
     """
     original_features = len(dataframe.columns)
 
-    # extracting X and y
-    X, y = common.split_Xy(dataframe.values)
+    # extracting y
+    _, y = common.split_Xy(dataframe.values)
 
     # variance selection
     variance_selector = VarianceThreshold(common.min_var)
@@ -26,32 +28,35 @@ def select_features(dataframe, n_features):
     features_selected = [dataframe.columns[i] for i in np.nditer(indices)]
     X_new = variance_selector.transform(X)
 
-    # recursive feature selection
-    # cls = classifier.svm()
-    # rfe_selector = RFE(
-    #     estimator=cls,
-    #     n_features_to_select=common.n_features,
-    #     verbose=1
-    # )
-    # rfe_selector.fit(X, y.ravel())
-    # indices = rfe_selector.get_support(indices=True)
-    # features_selected = [dataframe.columns[i] for i in np.nditer(indices)]
-    # X_new = rfe_selector.transform(X)
+    # console output
+    if verbose:
+        print('-- select_features completed--',
+              'variance threshold: ' + str(common.min_var),
+              'original features: ' + str(original_features),
+              'filtered features: ' + str(len(features_selected)),
+              '',
+              'features selected:',
+              sep='\n')
+
+        for feat in features_selected:
+            print(feat)
+        print()  # just a newline for the console
+
+    return variance_selector.get_support()
+
+
+def print_feature_variance(X, dataframe):
+    features = dataframe.columns[:-1]
+
+    # calculating the variance for every feature
+    variance = np.var(X, axis=0)
 
     # console output
-    print('-- select_features completed--',
-          'variance threshold: ' + str(common.min_var),
-          'original features: ' + str(original_features),
-          'filtered features: ' + str(len(features_selected)),
+    print('-- print_feature_variance completed--',
+          'variance of every feature:',
           '',
-          'features selected:',
           sep='\n')
+    for index, f in enumerate(features):
+        print(f + ': %0.4f' % variance[index])
 
-    for feat in features_selected:
-        print(feat)
-
-    print()  # just a newrow for the console
-    new_columns = features_selected + ['CLASS']
-    new_dataframe = pd.DataFrame(common.merge_Xy(X_new, y),
-                                 columns=new_columns)
-    return new_dataframe
+    print()  # newline

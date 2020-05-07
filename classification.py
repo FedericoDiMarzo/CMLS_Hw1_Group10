@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.model_selection import StratifiedKFold
 
 
-def set_classifier(X_train, y_train, classifier_type='svm'):
+def set_classifier(classifier_type='svm', verbose=False):
     """
     Sets the classifier
 
@@ -13,11 +13,16 @@ def set_classifier(X_train, y_train, classifier_type='svm'):
     :param classifier_type: choosen classifier
     """
     # console output
-    print('-- set_classifier --',
-          'classifier: ' + classifier_type,
-          sep='\n')
+    if verbose:
+        print('-- set_classifier --',
+              'classifier: ' + classifier_type,
+              '',
+              sep='\n')
 
     common.classifier = classifiers[classifier_type]()
+
+
+def fit_classifier(X_train, y_train):
     common.classifier.fit(X_train, y_train.ravel())
 
 
@@ -37,13 +42,14 @@ def test_classifier(X_test, y_test):
           sep='\n')
 
 
-def cross_validation(X, y, k=10):
+def cross_validation(X, y, k=10, verbose=False):
     """
     K fold cross validation
 
     :param X: whole data
     :param y: whole lables
     :param k: number of subdivisions
+    :return: the k_fold accuracy
     """
 
     scores = sklearn.model_selection.cross_val_score(
@@ -52,20 +58,25 @@ def cross_validation(X, y, k=10):
         y=y.flatten(),
         cv=k,
     )
+
     # console output
-    print('-- cross_validation --',
-          "accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2),
-          '',
-          sep='\n')
+    if verbose:
+        print('-- cross_validation --',
+              "accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2),
+              '',
+              sep='\n')
+
+    return scores.mean()
 
 
-def svm():
+def svm(verbose=False):
     # console output
-    poly_order = str(common.poly_degree) if common.kernel == 'poly' else ''
-    print('C: ' + str(common.regularization_parameter),
-          'kernel: ' + str(common.kernel) + poly_order,
-          '',
-          sep='\n')
+    if verbose:
+        poly_order = str(common.poly_degree) if common.kernel == 'poly' else ''
+        print('C: ' + str(common.regularization_parameter),
+              'kernel: ' + str(common.kernel) + poly_order,
+              '',
+              sep='\n')
 
     return sklearn.svm.SVC(
         C=common.regularization_parameter,
