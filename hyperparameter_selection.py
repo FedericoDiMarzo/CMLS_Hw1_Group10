@@ -26,9 +26,10 @@ def get_configuration_score(dataframe, X, y, verbose=False):
     # defining the classifier
     set_classifier(common.classifier_type)
 
-    # testing the classifier
-    # test_classifier(X_test, y_test)
+    # testing the classifier on the training set
     score = cross_validation(X, y, common.k_folds)
+
+
 
     # console output
     if verbose:
@@ -42,7 +43,7 @@ def get_configuration_score(dataframe, X, y, verbose=False):
     return score
 
 
-def validate_configuration(dataframe, X_train, y_train, X_validation, y_validation):
+def final_test(dataframe, X_train, y_train, X_test, y_test):
     best_parameters_path = os.path.join('resources', 'parameters', 'best_parameters.json')
     with open(best_parameters_path, 'r') as file:
         configuration = json.load(file)
@@ -50,7 +51,7 @@ def validate_configuration(dataframe, X_train, y_train, X_validation, y_validati
     common.set_configuration(configuration)
 
     # normalization
-    X_train, X_validation = DataNormalizer(X_train).transform(X_train, X_validation, common.normalization_type)
+    X_train, X_test = DataNormalizer(X_train).transform(X_train, X_test, common.normalization_type)
 
     # printing features variance
     print_feature_variance(X_train, dataframe)
@@ -58,11 +59,11 @@ def validate_configuration(dataframe, X_train, y_train, X_validation, y_validati
     # selecting the best features
     feature_mask = select_features(X_train, dataframe, verbose=True)
     X_train = X_train[:, feature_mask]
-    X_validation = X_validation[:, feature_mask]
+    X_test = X_test[:, feature_mask]
 
     # defining the classifier
     set_classifier(common.classifier_type, verbose=True)
     fit_classifier(X_train, y_train)
 
     # testing the classifier
-    test_classifier(X_validation, y_validation)
+    test_classifier(X_test, y_test)

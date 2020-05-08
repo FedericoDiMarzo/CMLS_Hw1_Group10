@@ -13,10 +13,10 @@ import time
 
 # contains all the parameter combinations that we want to try
 hyperparameters = {
-    'min_var': [0.005, 0.01, 0.015, 0.2],
+    'min_var': [0.005, 0.01, 0.015, 0.2,0.25],
     'classifier_type': ['svm'],
-    'regularization_parameter': [-2, -1, 0, 1, 2],
-    'kernel': ['linear', 'poly'],
+    'regularization_parameter': [0, 1, 2,5,10,100],
+    'kernel': ['rbf','linear', 'poly'],
     'poly_degree': [2, 3, 4, 5]
 }
 
@@ -33,7 +33,7 @@ dataframe = clean_data(dataframe)
 
 # separating data
 X, y = common.split_Xy(dataframe.values)
-X, X_validation, y, y_validation = train_test_split(X, y)
+X, X_test, y, y_test = train_test_split(X, y)
 
 # this part of the script can be really slow, thus it can
 # be turned off with the flag
@@ -80,4 +80,4 @@ if optimize_hyperparameters:
           sep="\n")
 
 # evaluating on validation set
-hs.validate_configuration(dataframe, X, y, X_validation, y_validation)
+hs.final_test(dataframe, X, y, X_test, y_test)
