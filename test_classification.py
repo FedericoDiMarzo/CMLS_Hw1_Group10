@@ -10,11 +10,11 @@ import time
 
 # contains all the parameter combinations that we want to try
 hyperparameters = {
-    'min_var': [0.005, 0.01, 0.015],  # features' variance in [0,0.015]
+    'min_var': [0.005],  # features' variance in [0,0.015]
     'classifier_type': ['svm'],
-    'regularization_parameter': [0.01, 1, 2, 5, 10, 100, 1000],  # reg_param > 0
+    'regularization_parameter': [0.01, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2],  # reg_param > 0
     'kernel': ['rbf', 'poly', 'linear'],
-    'poly_degree': [2, 3, 4, 5, 6, 7]
+    'poly_degree': [2, 3]
 }
 
 # flag for the hyperparameter optimization
