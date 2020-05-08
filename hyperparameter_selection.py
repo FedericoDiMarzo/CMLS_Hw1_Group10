@@ -73,6 +73,11 @@ def final_test(dataframe, X_train, y_train, X_test, y_test):
     # normalization
     X_train, X_test = DataNormalizer(X_train).transform(X_train, X_test, common.normalization_type)
 
+    # creating the normalized dataframe, used for plotting purposes
+    dataframe_path = os.path.join('resources', 'dataframes')
+    normalized_dataframe = pd.DataFrame(common.merge_Xy(X_train, y_train), columns=dataframe.columns)
+    normalized_dataframe.to_csv(os.path.join(dataframe_path, 'normalized_data.csv'))
+
     # printing features variance
     print_feature_variance(X_train, dataframe)
 

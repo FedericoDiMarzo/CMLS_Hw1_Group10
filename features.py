@@ -4,6 +4,8 @@ import common
 import librosa
 
 
+# TODO: some features are corrupted
+
 def zcr(**kwargs):
     """
     Calculates the zero crossing rate vector
