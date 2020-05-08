@@ -47,8 +47,3 @@ def merge_Xy(X, y):
     :return: merged matrix
     """
     return np.concatenate((X, y), axis=1)
-
-
-def set_configuration(configuration):
-    for parameter, value in configuration.items():
-        current_module.parameter = value

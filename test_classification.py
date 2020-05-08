@@ -1,8 +1,6 @@
 import os
-from feature_normalization import clean_data, DataNormalizer
+from feature_normalization import clean_data
 from sklearn.model_selection import train_test_split
-from feature_selection import select_features, print_feature_variance
-from classification import set_classifier, test_classifier, cross_validation
 import hyperparameter_selection as hs
 import itertools
 import pandas as pd
@@ -13,15 +11,15 @@ import time
 
 # contains all the parameter combinations that we want to try
 hyperparameters = {
-    'min_var': [0.005, 0.01, 0.015, 0.2,0.25],
+    'min_var': [0.005, 0.01, 0.015],  # features' variance in [0,0.015]
     'classifier_type': ['svm'],
-    'regularization_parameter': [0, 1, 2,5,10,100],
-    'kernel': ['rbf','linear', 'poly'],
-    'poly_degree': [2, 3, 4, 5]
+    'regularization_parameter': [0.01, 1, 2,5,10,100,1000], #reg_param > 0
+    'kernel': ['rbf','poly','linear'],
+    'poly_degree': [2, 3, 4, 5, 6, 7]
 }
 
 # flag for the hyperparameter optimization
-optimize_hyperparameters = True
+optimize_hyperparameters = False
 
 # reading data
 dataframe_folder = os.path.join('resources', 'dataframes')
@@ -55,10 +53,10 @@ if optimize_hyperparameters:
         print('[[iteration n.' + str(iteration_counter) + ']]')
 
         # sets the configuration
-        common.set_configuration(configuration)
+        #hs.set_configuration(configuration,common.classifier)
 
         # calculate the score of the configuration
-        score = hs.get_configuration_score(dataframe, X, y)
+        score = hs.get_configuration_score(configuration,dataframe, X, y)
 
         if score > best_parameters['score']:
             # updates the best parameters
