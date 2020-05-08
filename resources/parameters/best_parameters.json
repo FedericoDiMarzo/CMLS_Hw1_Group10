@@ -1,1 +1,1 @@
-{"score": 0.8628735632183909, "min_var": 0.005, "classifier_type": "svm", "regularization_parameter": 0, "kernel": "rbf", "poly_degree": 2}
+{"score": 0.8833333333333334, "min_var": 0.005, "classifier_type": "svm", "regularization_parameter": 1, "kernel": "poly", "poly_degree": 2}

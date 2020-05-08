@@ -8,13 +8,21 @@ import common
 import time
 import json
 
+
 def set_configuration(configuration):
+    """
+    Updates the configuration.
+    """
     common.classifier.kernel = configuration['kernel']
     common.classifier.C = configuration['regularization_parameter']
     common.classifier.poly_degree = configuration['poly_degree']
     common.min_var = configuration['min_var']
 
-def get_configuration_score(configuration,dataframe, X, y, verbose=False):
+
+def get_configuration_score(configuration, dataframe, X, y, verbose=False):
+    """
+    Gets the score of a certain configuration.
+    """
     timer_start = time.time()
 
     # normalization
@@ -34,14 +42,13 @@ def get_configuration_score(configuration,dataframe, X, y, verbose=False):
 
     # testing the classifier with cross-validation :
     score = cross_validation(X, y, common.k_folds)
-    #print(score)
-    #print(common.classifier)
+    # print(score)
+    # print(common.classifier)
 
-    #testing the classifier with standard validation :
-    #X_train,X_val,y_train,y_val = train_test_split(X, y)
-    #fit_classifier(X_train,y_train)
-    #score = common.classifier.score(X_val, y_val)
-
+    # testing the classifier with standard validation :
+    # X_train,X_val,y_train,y_val = train_test_split(X, y)
+    # fit_classifier(X_train,y_train)
+    # score = common.classifier.score(X_val, y_val)
 
     # console output
     if verbose:
@@ -56,6 +63,9 @@ def get_configuration_score(configuration,dataframe, X, y, verbose=False):
 
 
 def final_test(dataframe, X_train, y_train, X_test, y_test):
+    """
+    Evaluates the configuration for the test data.
+    """
     best_parameters_path = os.path.join('resources', 'parameters', 'best_parameters.json')
     with open(best_parameters_path, 'r') as file:
         configuration = json.load(file)

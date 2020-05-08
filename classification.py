@@ -23,6 +23,9 @@ def set_classifier(classifier_type='svm', verbose=False):
 
 
 def fit_classifier(X_train, y_train):
+    """
+    Fits the classifier with train data
+    """
     common.classifier.fit(X_train, y_train.ravel())
 
 
@@ -70,6 +73,28 @@ def cross_validation(X, y, k=10, verbose=False):
 
 
 def svm(verbose=False):
+    """
+    Returns a support vector machine classifier
+    """
+    # console output
+    if verbose:
+        poly_order = str(common.poly_degree) if common.kernel == 'poly' else ''
+        print('C: ' + str(common.regularization_parameter),
+              'kernel: ' + str(common.kernel) + poly_order,
+              '',
+              sep='\n')
+
+    return sklearn.svm.SVC(
+        C=common.regularization_parameter,
+        kernel=common.kernel,
+        degree=common.poly_degree
+    )
+
+
+def svm(verbose=False):
+    """
+    Returns a support vector machine classifier
+    """
     # console output
     if verbose:
         poly_order = str(common.poly_degree) if common.kernel == 'poly' else ''

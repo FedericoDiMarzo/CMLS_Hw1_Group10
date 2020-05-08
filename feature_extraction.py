@@ -17,7 +17,6 @@ def preprocess(audio_path):
     :param audio_path: url of the audio file
     :return: (mfcc, windowed_audio, fs)
     """
-    # TODO: fine tune these parameters
     n_fft = common.n_fft
     win_length = common.win_length
     hop_size = common.hop_size
@@ -29,10 +28,10 @@ def preprocess(audio_path):
     fmax = common.fmax
 
     # loading from the path
-    audio, fs = librosa.load(audio_path, sr=None)  # TODO: do we need preprocessing?
+    audio, fs = librosa.load(audio_path, sr=None)
 
     # audio preprocessing
-    audio = audio / np.max(audio)
+    audio = (audio - np.min(audio)) / (np.max(audio) - np.min(audio))
 
     # time domain windowing
     window = sp.signal.get_window(window=window, Nx=win_length)
