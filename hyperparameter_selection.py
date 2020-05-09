@@ -93,7 +93,8 @@ def final_test(dataframe, X_train, y_train, X_test, y_test):
     fit_classifier(X_train, y_train)
 
     # testing the classifier
-    print('best parameters selected for the test : ',
+    print('-- best configuration loaded --',
+          'best parameters selected for the test : ',
           configuration,
           '',
           sep="\n")
