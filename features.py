@@ -131,55 +131,46 @@ def spectral_decrease_mean(**kwargs):
     return np.mean(sdc)
 
 
-def onset_events(filter_type):
+def onset_events(**kwargs):
     """
     Number of onsets event over a threshold per second
 
-    :param filter_type, either lowpass or highpass
+    A different onset ratio is calculated for a low band
+    and an high band
     """
+    audio = kwargs['audio']
+    fs = kwargs['fs']
+    x = audio
+    fs = kwargs['fs']
 
-    def _onset_events(**kwargs):
-        """
-        A different onset ratio is calculated for a low band
-        and an high band
-        """
-        audio = kwargs['audio']
-        fs = kwargs['fs']
-        cutoff_frequency = 700  # in Hz
-        ftr = sp.signal.firwin(2 ** 5 - 1, cutoff_frequency, pass_zero=filter_type, fs=fs)
-        x = sp.signal.lfilter(ftr, 1, audio)
-        fs = kwargs['fs']
+    # duration in seconds
+    duration = x.size / fs
 
-        # duration in seconds
-        duration = x.size / fs
+    # root mean square energy
+    rmse = librosa.feature.rms(
+        y=x ** 2,
+        frame_length=common.win_length,
+        hop_length=common.hop_size
+    ).flatten()
 
-        # root mean square energy
-        rmse = librosa.feature.rms(
-            y=x ** 2,
-            frame_length=common.win_length,
-            hop_length=common.hop_size
-        ).flatten()
+    # logarithmic compression
+    rmse_log = np.log(1 + rmse)
 
-        # logarithmic compression
-        rmse_log = np.log(1 + rmse)
+    # novelty function
+    nvt = np.diff(rmse_log)
+    nvt[nvt < 0] = 0  # half wave rectification
 
-        # novelty function
-        nvt = np.diff(rmse_log)
-        nvt[nvt < 0] = 0  # half wave rectification
+    # adaptive threshold
+    thr = sp.signal.medfilt(nvt, 9)
+    thr += 0.01
 
-        # adaptive threshold
-        thr = sp.signal.medfilt(nvt, 9)
-        thr += 0.01
+    # hits over the threshold
+    hits = np.zeros_like(nvt)
+    hits[nvt > thr] = 1
+    total_hits = np.sum(hits)
+    hits_per_second = total_hits / duration
 
-        # hits over the threshold
-        hits = np.zeros_like(nvt)
-        hits[nvt > thr] = 1
-        total_hits = np.sum(hits)
-        hits_per_second = total_hits / duration
-
-        return hits_per_second
-
-    return _onset_events
+    return hits_per_second
 
 
 def mfcc_mean(cep_coef):
@@ -302,8 +293,7 @@ feature_functions = {
     'spectral_flux_mean': spectral_flux_mean,
     'spectral_rolloff_mean': spectral_rolloff_mean,
     'spectral_spread_mean': spectral_spread_mean,
-    'onset_rate_low': onset_events('lowpass'),
-    'onset_rate_high': onset_events('highpass'),
+    'onset_rate': onset_events,
     'chroma_max': chroma_max,
     'chroma_min': chroma_min,
     'chroma_centroid_mean': chroma_centroid_mean,

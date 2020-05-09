@@ -5,7 +5,6 @@ import numpy as np
 import scipy as sp
 import pandas as pd
 import time
-import matplotlib.pyplot as plt
 import common
 
 
@@ -31,7 +30,7 @@ def preprocess(audio_path):
     audio, fs = librosa.load(audio_path, sr=None)
 
     # audio preprocessing
-    audio = (audio - np.min(audio)) / (np.max(audio) - np.min(audio))
+    audio = (2 * (audio - np.min(audio)) / (np.max(audio) - np.min(audio))) - 1
 
     # time domain windowing
     window = sp.signal.get_window(window=window, Nx=win_length)
