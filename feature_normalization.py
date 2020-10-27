@@ -1,8 +1,6 @@
 import numpy as np
 from sklearn import preprocessing
 
-import Xy_train_test
-
 
 def clean_data(dataframe):
     """

@@ -1,16 +1,12 @@
 import common
 import sklearn
-import numpy as np
-from sklearn.model_selection import StratifiedKFold
 
 
 def set_classifier(classifier_type='svm', verbose=False):
     """
     Sets the classifier
 
-    :param X_train: train data
-    :param y_train: train lables
-    :param classifier_type: choosen classifier
+    :param classifier_type: classifier
     """
     # console output
     if verbose:
