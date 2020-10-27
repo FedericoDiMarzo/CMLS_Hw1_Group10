@@ -26,11 +26,11 @@ This paper describes the main steps needed to implement our music genre classifi
 some insights about the code structure and our conclusions about the overall performances.
 
 The work was divided into the following main steps:
- Preprocessing
- Feature extraction
- Feature selection
- Hyperparameters optimization
- Training and cross-validation
+- Preprocessing
+- Feature extraction
+- Feature selection
+- Hyperparameters optimization
+- Training and cross-validation
 
 
 ## Preprocessing
@@ -86,38 +86,38 @@ The features that were computed are enlisted and explained below. In particular,
 for each descriptor, the feature corresponds to its mean value and, when specified, also to its standard
 deviation.
 
- Zero Crossing Rate
+- Zero Crossing Rate
 It is computed for every frame x of windowed audio as
 xxxx
 For the zero crossing rate, the standard deviation is evaluated alongside the mean value.
 
- Spectral Centroid
+- Spectral Centroid
 It is computed from the time-frequency matrix X as
 xxxx
 By visualizing the curves of the spectral centroid mean, we can consider it as a good feature to
 consider in order to distinguish the ’disco’ class.
 
- Spectral Flux
+- Spectral Flux
 It measures how quickly the power spectrum varies from frame by frame. It is computed as
 xxxx
 
- Spectral Spread
+- Spectral Spread
 It describes the average deviation of the spectrum around its centroid, and is computed as
 xxxx
 
- Spectral Roll-Off
+- Spectral Roll-Off
 It is the frequency below a certain specified percentage of the toatl spectral energy lies. The
 percentage chosen for the problem in object was 85%. The frequency is evaluated as
 xxxx
 
- Spectral Decrease
+- Spectral Decrease
 The spectral decrease aims at quantifying the amount of decrease of the amplitude spectrum.
 Coming from perceptive studies, it is supposed to be more correlated with human perception.
 It quantifies the amount of decrease of the amplitude spectrum, and it is more correlated with
 human perception. It is computed as
 xxxx
 
- Mel-Frequency Cepstral Coefficients (MFCCs)
+- Mel-Frequency Cepstral Coefficients (MFCCs)
 The Mel-Frequency Coefficient are extracted as described in the previous section. In particular,
 for every coefficients from 2 to 14 the mean value and the standard deviation were evaluated.
 Those features are among the most powerful for genre classification. As expected, it was possible
@@ -131,7 +131,7 @@ This last aspect is justified if we consider the type of instrument that are use
 more rhythmic based instruments for the former, more classical and less rhythmic instruments
 for the latter.
 
- Chroma Features
+- Chroma Features
 As described in the previous chapter, the chromagram was computed in the pre-processing stage
 and was used to calculate different features, many of which are already described above, as the
 Chroma Centroid, Chroma Spread, Chroma Flux. In particular, their mean value was taken
@@ -140,7 +140,7 @@ coefficient were extracted, as well as the chroma bins associated to the maximum
 energy. The performances will be extensively discussed later, but it was clear from the graphics
 that they tended to perform quite nicely.
 
- Onset Events
+- Onset Events
 This feature is a descriptor of how many onset events, or roughly the transient signals, occur in
 a specific amount of time. Specifically, it was chosen to count the total number of ”hits” over
 the whole duration of the song, obtaining a normalization of ”hits per second”.
@@ -182,12 +182,12 @@ This type of classifier creates binary classifiers for each pair of class and th
 It is often used for its good performances in multiclass-classification problems.
 The “hyperparameters” that we will optimize during the cross-validation are:
 
- kernel: the rbf kernel is the default kernel. It provides good performances, but a linear or
+- kernel: the rbf kernel is the default kernel. It provides good performances, but a linear or
 polynomial kernel might also be very effective with the right degree;
- poly degree: in case of polynomial kernel;
- regularization: to adjust the complexity of the model, and how well it has to fit to the training
+- poly degree: in case of polynomial kernel;
+- regularization: to adjust the complexity of the model, and how well it has to fit to the training
 data;
- min var: minimum variance threshold for the features’ selection.
+- min var: minimum variance threshold for the features’ selection.
 
 #### Parameters optimization
 For each configuration, i.e. each combination of parameters, we:
@@ -231,11 +231,11 @@ entire algorithm several times and check that the values are always close to 0.9
 #### Interpretation
 The confusion matrix tells us what are the pairs of class that the algorithm solves
 the best.
- Indeed, the sounds of classical and jazz music are sometimes similar since they both use classical
+- Indeed, the sounds of classical and jazz music are sometimes similar since they both use classical
 instruments. This explains those 6 misclassified jazz/classical samples.
- On the other side, both country and disco have drums and guitars and are easily distinguished
+- On the other side, both country and disco have drums and guitars and are easily distinguished
 from classical, which explains the 0 misclassified disco/country samples for the classical class.
- The same happens for country and disco, that share a greater musical affinity between each
+- The same happens for country and disco, that share a greater musical affinity between each
 other than with classical or jazz. This explain those 4 misclassified disco/country samples.
 
 
