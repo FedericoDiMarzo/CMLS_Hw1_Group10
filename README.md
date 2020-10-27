@@ -271,6 +271,13 @@ enough to update the response of whole system, allowing for an easier testabilit
 Debug Console Logs Our software informs the user about different aspects concerning the execution state, in order to give a clear picture of the progresses of the algorithm, highlighting the
 execution time of every section
 
+#### Usage
+To test the system, two scripts are provided: 
+- *test_feature_extraction.py*, to extract the features from the dataset, and save them in csv format
+- *test_classification.py*, to select the best parameters and testing the optimal classifier
+
+In order to try different parameters, the "hyperparameter" dictionary, inside *test_classification.py* can be modified
+
 ## Conclusions
 To conclude, we obtained an efficient genre classifier for the four selected genres, with a test error
 equal to about 10%. The main errors occur when the classifier has to distinguish jazz from classical
