@@ -86,38 +86,40 @@ The features that were computed are enlisted and explained below. In particular,
 for each descriptor, the feature corresponds to its mean value and, when specified, also to its standard
 deviation.
 
-- Zero Crossing Rate
-It is computed for every frame x of windowed audio as
-xxxx
+- **Zero Crossing Rate**  
+It is computed for every frame x of windowed audio as  
+<a href="https://www.codecogs.com/eqnedit.php?latex=ZCR&space;=&space;\frac{Fs}{2N}\sum_{i=0}^{N-1}|sign(x(i&plus;1))-sign(x(i))|" target="_blank"><img src="https://latex.codecogs.com/gif.latex?ZCR&space;=&space;\frac{Fs}{2N}\sum_{i=0}^{N-1}|sign(x(i&plus;1))-sign(x(i))|" title="ZCR = \frac{Fs}{2N}\sum_{i=0}^{N-1}|sign(x(i+1))-sign(x(i))|" /></a>  
 For the zero crossing rate, the standard deviation is evaluated alongside the mean value.
 
-- Spectral Centroid
-It is computed from the time-frequency matrix X as
-xxxx
+- **Spectral Centroid**  
+It is computed from the time-frequency matrix X as  
+<a href="https://www.codecogs.com/eqnedit.php?latex=C&space;=&space;\frac{\sum_{K=1}^{K/2}k|X(k)|)}{\sum_{K=1}^{K/2}|X(k)|}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?C&space;=&space;\frac{\sum_{K=1}^{K/2}k|X(k)|)}{\sum_{K=1}^{K/2}|X(k)|}" title="C = \frac{\sum_{K=1}^{K/2}k|X(k)|)}{\sum_{K=1}^{K/2}|X(k)|}" /></a>  
 By visualizing the curves of the spectral centroid mean, we can consider it as a good feature to
 consider in order to distinguish the ’disco’ class.
 
-- Spectral Flux
-It measures how quickly the power spectrum varies from frame by frame. It is computed as
-xxxx
+- **Spectral Flux**  
+It measures how quickly the power spectrum varies from frame by frame. It is computed as  
+<a href="https://www.codecogs.com/eqnedit.php?latex=Flux&space;=&space;\frac{\sqrt{\sum_{i=0}^{N-1}|X(i&plus;1)-X(i))|}}{N}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?Flux&space;=&space;\frac{\sqrt{\sum_{i=0}^{N-1}|X(i&plus;1)-X(i))|}}{N}" title="Flux = \frac{\sqrt{\sum_{i=0}^{N-1}|X(i+1)-X(i))|}}{N}" /></a>
 
-- Spectral Spread
-It describes the average deviation of the spectrum around its centroid, and is computed as
-xxxx
+- **Spectral Spread**  
+It describes the average deviation of the spectrum around its centroid, and is computed as  
+<a href="https://www.codecogs.com/eqnedit.php?latex=Spread&space;=&space;\frac{\sum_{k=0}^{N-1}(k&space;-&space;C)^2&space;X(k)}{\sum_{k=0}^{N-1}X(k)}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?Spread&space;=&space;\frac{\sum_{k=0}^{N-1}(k&space;-&space;C)^2&space;X(k)}{\sum_{k=0}^{N-1}X(k)}" title="Spread = \frac{\sum_{k=0}^{N-1}(k - C)^2 X(k)}{\sum_{k=0}^{N-1}X(k)}" /></a>
 
-- Spectral Roll-Off
+- **Spectral Roll-Off**  
 It is the frequency below a certain specified percentage of the toatl spectral energy lies. The
-percentage chosen for the problem in object was 85%. The frequency is evaluated as
-xxxx
+percentage chosen for the problem in object was 85%. The frequency is evaluated as  
+<a href="https://www.codecogs.com/eqnedit.php?latex=SR&space;=&space;K_r\frac{Fs}{2N}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?SR&space;=&space;K_r\frac{Fs}{2N}" title="SR = K_r\frac{Fs}{2N}" /></a>  
+where  
+<a href="https://www.codecogs.com/eqnedit.php?latex=\sum_{k=0}^{Kr}|X(k)|=0.85\sum_{k=0}^{K/2}|X(k)|" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\sum_{k=0}^{Kr}|X(k)|=0.85\sum_{k=0}^{K/2}|X(k)|" title="\sum_{k=0}^{Kr}|X(k)|=0.85\sum_{k=0}^{K/2}|X(k)|" /></a>
 
-- Spectral Decrease
+- **Spectral Decrease**  
 The spectral decrease aims at quantifying the amount of decrease of the amplitude spectrum.
 Coming from perceptive studies, it is supposed to be more correlated with human perception.
 It quantifies the amount of decrease of the amplitude spectrum, and it is more correlated with
-human perception. It is computed as
-xxxx
+human perception. It is computed as  
+<a href="https://www.codecogs.com/eqnedit.php?latex=SDC&space;=&space;\frac{1}{\sum_{k=1}^{K/2}|X(k)|}\sum_{k=1}^{K/2}\frac{|X(K)|&space;-&space;|X(0)|}{k}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?SDC&space;=&space;\frac{1}{\sum_{k=1}^{K/2}|X(k)|}\sum_{k=1}^{K/2}\frac{|X(K)|&space;-&space;|X(0)|}{k}" title="SDC = \frac{1}{\sum_{k=1}^{K/2}|X(k)|}\sum_{k=1}^{K/2}\frac{|X(K)| - |X(0)|}{k}" /></a>
 
-- Mel-Frequency Cepstral Coefficients (MFCCs)
+- **Mel-Frequency Cepstral Coefficients (MFCCs)**  
 The Mel-Frequency Coefficient are extracted as described in the previous section. In particular,
 for every coefficients from 2 to 14 the mean value and the standard deviation were evaluated.
 Those features are among the most powerful for genre classification. As expected, it was possible
@@ -131,7 +133,7 @@ This last aspect is justified if we consider the type of instrument that are use
 more rhythmic based instruments for the former, more classical and less rhythmic instruments
 for the latter.
 
-- Chroma Features
+- **Chroma Features**  
 As described in the previous chapter, the chromagram was computed in the pre-processing stage
 and was used to calculate different features, many of which are already described above, as the
 Chroma Centroid, Chroma Spread, Chroma Flux. In particular, their mean value was taken
@@ -140,7 +142,7 @@ coefficient were extracted, as well as the chroma bins associated to the maximum
 energy. The performances will be extensively discussed later, but it was clear from the graphics
 that they tended to perform quite nicely.
 
-- Onset Events
+- **Onset Events**  
 This feature is a descriptor of how many onset events, or roughly the transient signals, occur in
 a specific amount of time. Specifically, it was chosen to count the total number of ”hits” over
 the whole duration of the song, obtaining a normalization of ”hits per second”.
@@ -171,7 +173,7 @@ better with respect to the dataset used, as shown in Figure 4.
 Now that we have a clearer view of our features, we can start to build our classifier. Our strategy is
 to train an SVM-classifier, and to optimize some of its parameters using cross-validation.
 
-####Splitting the data
+#### Splitting the data
 First, we split the dataset into a training set of 300 samples and a testing
 set of 100 samples. Later, the training set will be divided into k=10 subsets of 30 samples for
 cross-validation.
